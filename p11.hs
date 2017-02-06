@@ -37,3 +37,25 @@ maxInLR n = maxInRows n . transpose . zipWith drop [0..]
 maxInRL n = maxInLR n . map reverse
 
 main = print $ maximum $ map (flip ($ 4) grid) [maxInRows, maxInCols, maxInLR, maxInRL]
+
+
+-------------------
+-- another solution
+
+maxQuadInGrid grid = 
+	let
+		horizontals      = id
+		verticals        = transpose
+		diagonalsQuarter = transpose.zipWith drop [0..]
+		localmaxima      = map (maximum. map (product. take 4). tails)
+		join             = concatMap (flip ($) grid)
+	in
+		maximum. 
+		localmaxima.
+		join $
+			[horizontals
+			,verticals
+			,diagonalsQuarter
+			,diagonalsQuarter. reverse
+			,diagonalsQuarter. map reverse
+			,diagonalsQuarter. map reverse. reverse] 
