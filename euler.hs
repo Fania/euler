@@ -27,6 +27,7 @@ problem4 = maximum [x * y | x <- [100..999], y <- [100..999], isPal (x * y)]
 
 
 -- 5: Smallest multiple
+-- UNSOLVED
 problem5 = head [ x | x <- [1..], check1 x]
   where divBy x y = mod x y == 0
         check1 x = all (==True) (map (divBy x) [1..10])
@@ -75,6 +76,7 @@ problem9 = head [a*b*(1000-(a+b)) | a <- [1..998], b <- [1..(999-a)], isPyth a b
 
 
 -- 10: Summation of primes
+-- UNSOLVED
 problem10 = sum (take 2000000 primes)
 
 
@@ -130,7 +132,7 @@ problem11 = maximum maxHVD
 
 
 -- 12: Highly divisible triangular number
-
+-- UNSOLVED
 tnum 0 = 0
 tnum x = x + tnum (x-1)
 tnums = [ tnum x | x <- [1..] ]
@@ -142,7 +144,7 @@ problem12 = head [ x | x <- tnums, length (factors x) > 500 ]
 
 
 -- 14: Longest Collatz sequence
-
+-- UNSOLVED
 collatz x | even x    = x `div` 2
           | otherwise = 3 * x + 1
 
@@ -153,7 +155,7 @@ problem14 = snd $ maximum $ [ (length (collseq x), x) | x <- [1..999999] ]
 
 
 -- 15: Lattice paths
-
+-- UNSOLVED
 
 -- 16: Power digit sum
 problem16 = sum $ map ( \x -> read [x] :: Int ) ( show $ 2 ^ 1000 )
@@ -164,18 +166,15 @@ problem16 = sum $ map ( \x -> read [x] :: Int ) ( show $ 2 ^ 1000 )
 singles = [(1,"one"), (2,"two"), (3,"three"), (4,"four"), (5,"five"),
            (6,"six"), (7,"seven"), (8,"eight"), (9,"nine"), (0,"")]
 
-irregulars = [(11,"eleven"),(12,"twelve"),(13,"thirteen"),(15,"fifteen")]
-ten = [(10,"ten"),(20,"twenty"),(30,"thirty"),(40,"fourty"),(50,"fifty"),
-        (60,"sixty"),(70,"seventy"),(80,"eighty"),(90,"ninety")]
+irregulars = [(0,"ten"),(1,"eleven"),(2,"twelve"),(3,"thirteen"),
+              (4,"fourteen"),(5,"fifteen"),(6,"sixteen"),(7,"seventeen"),
+              (8,"eighteen"),(9,"nineteen")]
 
-tens n 
-  | n `elem` [4,6,7,8,9] = unjust (lookup n singles) ++ "teen"
-  | otherwise = unjust (lookup n ten)
+tens = [(2,"twenty"),(3,"thirty"),(4,"forty"),(5,"fifty"),
+        (6,"sixty"),(7,"seventy"),(8,"eighty"),(9,"ninety")]
 
-hundreds n = unjust (lookup n singles) ++ " hundred"
-thousands n = unjust (lookup n singles) ++ " thousand"
-
-allnums = concat [singles, irregulars, ten]
+hundreds n = unjust (lookup n singles) ++ "hundred"
+thousands n = unjust (lookup n singles) ++ "thousand"
 
 numList n = map ( \x -> read [x] :: Int ) ( show n )
 
@@ -184,13 +183,19 @@ listNum (n:ns) = (show n) ++ listNum ns
 
 listInt s = read s :: Int
 
--- test1 [x] = unjust (lookup x singles)
--- test1 [x,y] = unjust (lookup (listInt (listNum [x,y]))) tens
--- test1 [x,y,z] = 
--- test1 [w,x,y,z] = 
+translate [x] = unjust (lookup x singles)
+translate [x,y] 
+  | x == 0 = translate [y]
+  | x == 1 = unjust (lookup y irregulars)
+  | otherwise = unjust (lookup x tens) ++ unjust (lookup y singles)
+translate [x,y,z]
+  | x == 0 = translate [y,z]
+  | x `elem` [1..9] && y == 0 && z `elem` [1..9] = hundreds x ++ "and" ++ translate [z]
+  | x `elem` [1..9] && y == 0 && z == 0 = hundreds x
+  | otherwise = hundreds x ++ "and" ++ translate [y,z]
+translate [w,x,y,z] = thousands w ++ translate [x,y,z]
 
-
--- test n = test1 (numList n)
+problem17 = length ( concat [ translate (numList x) | x <- [1..1000]] )
 
 unjust Nothing = []
 unjust (Just x) = x
