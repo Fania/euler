@@ -138,3 +138,62 @@ tnums = [ tnum x | x <- [1..] ]
 factors n = [x | x <- [1..n], n `mod` x == 0]
 
 problem12 = head [ x | x <- tnums, length (factors x) > 500 ]
+
+
+
+-- 14: Longest Collatz sequence
+
+collatz x | even x    = x `div` 2
+          | otherwise = 3 * x + 1
+
+collseq 1 = [1]
+collseq n = n : collseq (collatz n)
+
+problem14 = snd $ maximum $ [ (length (collseq x), x) | x <- [1..999999] ]
+
+
+-- 15: Lattice paths
+
+
+-- 16: Power digit sum
+problem16 = sum $ map ( \x -> read [x] :: Int ) ( show $ 2 ^ 1000 )
+
+
+-- 17: Number letter counts
+
+singles = [(1,"one"), (2,"two"), (3,"three"), (4,"four"), (5,"five"),
+           (6,"six"), (7,"seven"), (8,"eight"), (9,"nine"), (0,"")]
+
+irregulars = [(11,"eleven"),(12,"twelve"),(13,"thirteen"),(15,"fifteen")]
+ten = [(10,"ten"),(20,"twenty"),(30,"thirty"),(40,"fourty"),(50,"fifty"),
+        (60,"sixty"),(70,"seventy"),(80,"eighty"),(90,"ninety")]
+
+tens n 
+  | n `elem` [4,6,7,8,9] = unjust (lookup n singles) ++ "teen"
+  | otherwise = unjust (lookup n ten)
+
+hundreds n = unjust (lookup n singles) ++ " hundred"
+thousands n = unjust (lookup n singles) ++ " thousand"
+
+allnums = concat [singles, irregulars, ten]
+
+numList n = map ( \x -> read [x] :: Int ) ( show n )
+
+listNum [] = []
+listNum (n:ns) = (show n) ++ listNum ns
+
+listInt s = read s :: Int
+
+-- test1 [x] = unjust (lookup x singles)
+-- test1 [x,y] = unjust (lookup (listInt (listNum [x,y]))) tens
+-- test1 [x,y,z] = 
+-- test1 [w,x,y,z] = 
+
+
+-- test n = test1 (numList n)
+
+unjust Nothing = []
+unjust (Just x) = x
+
+
+
