@@ -310,3 +310,33 @@ problem21 = sum (amis 9999)
 -- 31626
 --------------------------------------------------------------------------
 
+
+-- 23: Non-abundant sums
+-- UNSOLVED
+-- isPerfect n = (sum $ divisors n) == n
+isAbundant n = (sum $ divisors n) > n
+-- isDeficient n = (sum $ divisors n) < n
+
+-- perfects = [x | x <- [1..], isPerfect x]
+abundants = [x | x <- [1..], isAbundant x]
+
+problem23 = sum [ x + x | x <- [1..28123], not (isAbundant x) ]
+-- UNSOLVED
+--------------------------------------------------------------------------
+
+
+--24: Lexicographic permutations
+problem24 = (sort (permutations [0,1,2,3,4,5,6,7,8,9])) !! 999999
+-- 2783915460
+--------------------------------------------------------------------------
+
+
+--25: 1000-digit Fibonacci number
+fibs = 1:1: zipWith (+) fibs (tail fibs)
+intToList n = map ( \x -> read [x] :: Int ) ( show n )
+lens = map length (map (intToList) fibs)
+problem25 = (findIndex (==1000) lens) + 1
+-- 4782
+--------------------------------------------------------------------------
+
+
