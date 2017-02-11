@@ -289,13 +289,13 @@ allDates = concat $ map addDays monyear
 everyf n [] = []
 everyf n as  = head as : everyf n (drop n as)
 
-mondays = [ ("Mon",d,m,y) | (d,m,y) <- (everyf 7 allDates) ]
-tuesdays = [ ("Tue",d,m,y) | (d,m,y) <- (everyf 7 (drop 1 allDates)) ]
+mondays =    [ ("Mon",d,m,y) | (d,m,y) <- (everyf 7 allDates) ]
+tuesdays =   [ ("Tue",d,m,y) | (d,m,y) <- (everyf 7 (drop 1 allDates)) ]
 wednesdays = [ ("Wed",d,m,y) | (d,m,y) <- (everyf 7 (drop 2 allDates)) ]
-thursdays = [ ("Thu",d,m,y) | (d,m,y) <- (everyf 7 (drop 3 allDates)) ]
-fridays = [ ("Fri",d,m,y) | (d,m,y) <- (everyf 7 (drop 4 allDates)) ]
-saturdays = [ ("Sat",d,m,y) | (d,m,y) <- (everyf 7 (drop 5 allDates)) ]
-sundays = [ ("Sun",d,m,y) | (d,m,y) <- (everyf 7 (drop 6 allDates)) ]
+thursdays =  [ ("Thu",d,m,y) | (d,m,y) <- (everyf 7 (drop 3 allDates)) ]
+fridays =    [ ("Fri",d,m,y) | (d,m,y) <- (everyf 7 (drop 4 allDates)) ]
+saturdays =  [ ("Sat",d,m,y) | (d,m,y) <- (everyf 7 (drop 5 allDates)) ]
+sundays =    [ ("Sun",d,m,y) | (d,m,y) <- (everyf 7 (drop 6 allDates)) ]
 
 weekDates = concat [mondays, tuesdays, wednesdays, thursdays, fridays, saturdays, sundays]
 
