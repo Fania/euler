@@ -48,16 +48,17 @@ problem5 = head [ x | x <- [1..], check1 x]
 
 -- divBy x y = mod x y == 0
 
--- check x [] = True
--- check x (y:ys) 
---   | divBy x y = check x ys
---   | otherwise = False
--- test = [ x | x <- [1..], check x [1..10] ]
+{-
+check x [] = True
+check x (y:ys) 
+  | divBy x y = check x ys
+  | otherwise = False
+test = [ x | x <- [1..], check x [1..10] ]
 
--- problem5a = head [ x | x <- [1..], check1 x == False]
---   where divBy x y = mod x y == 0
---         check1 x = any (==False) (map (divBy x) [1..20])
-
+problem5a = head [ x | x <- [1..], check1 x == False]
+  where divBy x y = mod x y == 0
+        check1 x = any (==False) (map (divBy x) [1..20])
+-}
 --------------------------------------------------------------------------
 
 -- 6: Sum square difference
@@ -265,19 +266,43 @@ problem18 = maximum [ sum path | path <- travel babytree ]
 --------------------------------------------------------------------------
 
 -- 19: Counting Sundays
--- How many Sundays fell on the first of the month during the twentieth century (1 Jan 1901 to 31 Dec 2000)?
+months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 
--- 1 Jan 1900 was a Monday.
--- Thirty days has September,
--- April, June and November.
--- All the rest have thirty-one,
--- Saving February alone,
--- Which has twenty-eight, rain or shine.
--- And on leap years, twenty-nine.
--- A leap year occurs on any year evenly divisible by 4, but not on a century unless it is divisible by 400.
+monyear = [ (m,y) | y <- [1900 .. 2000], m <- months ]
 
+m30s = filter (\(m,y) -> m `elem` ["Apr","Jun","Sep","Nov"]) monyear
+m31s = filter (\(m,y) -> ((m,y) `notElem` m30s) && m /= "Feb") monyear
+m29s = filter (\(m,y) -> m == "Feb" && (y `mod` 4) == 0 && y /= 1900) monyear
+m28s = filter (\(m,y) -> m == "Feb" && ((m,y) `notElem` m29s)) monyear
 
--- getday d m y = 
+addDays (m,y)
+  | (m,y) `elem` m30s = 
+    [ (d,m,y) | d <- [1..30] ]
+  | (m,y) `elem` m29s = 
+    [ (d,m,y) | d <- [1..29] ] -- Leap years
+  | (m,y) `elem` m28s = 
+    [ (d,m,y) | d <- [1..28] ] -- Non-leap years
+  | otherwise = [ (d,m,y) | d <- [1..31] ]
+
+allDates = concat $ map addDays monyear
+
+everyf n [] = []
+everyf n as  = head as : everyf n (drop n as)
+
+mondays = [ ("Mon",d,m,y) | (d,m,y) <- (everyf 7 allDates) ]
+tuesdays = [ ("Tue",d,m,y) | (d,m,y) <- (everyf 7 (drop 1 allDates)) ]
+wednesdays = [ ("Wed",d,m,y) | (d,m,y) <- (everyf 7 (drop 2 allDates)) ]
+thursdays = [ ("Thu",d,m,y) | (d,m,y) <- (everyf 7 (drop 3 allDates)) ]
+fridays = [ ("Fri",d,m,y) | (d,m,y) <- (everyf 7 (drop 4 allDates)) ]
+saturdays = [ ("Sat",d,m,y) | (d,m,y) <- (everyf 7 (drop 5 allDates)) ]
+sundays = [ ("Sun",d,m,y) | (d,m,y) <- (everyf 7 (drop 6 allDates)) ]
+
+weekDates = concat [mondays, tuesdays, wednesdays, thursdays, fridays, saturdays, sundays]
+
+sun1s = [ (wd,d,m,y) | (wd,d,m,y) <- weekDates, wd == "Sun", d == 1, y > 1900 ]
+
+problem19 = length sun1s
+-- 171
 
 --------------------------------------------------------------------------
 
@@ -325,17 +350,17 @@ problem23 = sum [ x + x | x <- [1..28123], not (isAbundant x) ]
 
 --------------------------------------------------------------------------
 
---24: Lexicographic permutations
+-- 24: Lexicographic permutations
 problem24 = (sort (permutations [0,1,2,3,4,5,6,7,8,9])) !! 999999
 -- 2783915460
 
 --------------------------------------------------------------------------
 
---25: 1000-digit Fibonacci number
+-- 25: 1000-digit Fibonacci number
 fibs = 1:1: zipWith (+) fibs (tail fibs)
 intToList n = map ( \x -> read [x] :: Int ) ( show n )
 lens = map length (map (intToList) fibs)
-problem25 = (findIndex (==1000) lens) + 1
+problem25 = (unjuster (findIndex (==1000) lens)) + 1
 -- 4782
 
 --------------------------------------------------------------------------

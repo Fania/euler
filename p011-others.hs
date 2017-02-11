@@ -43,7 +43,7 @@ main = print $ maximum $ map (flip ($ 4) grid) [maxInRows, maxInCols, maxInLR, m
 -- another solution
 
 maxQuadInGrid grid = 
-	let
+        let
 		horizontals      = id
 		verticals        = transpose
 		diagonalsQuarter = transpose.zipWith drop [0..]
