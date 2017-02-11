@@ -17,18 +17,16 @@ problem2 = sum [x | x <- takeWhile (< 4000000) (fib 0 1)]
 --------------------------------------------------------------------------
 
 -- 3: Largest prime factor
-primes = filterPrime [2..] 
-  where filterPrime (p:xs) = 
-          p : filterPrime [x | x <- xs, x `mod` p /= 0]
+primes = 2 : filter (null . tail . primeFactors) [3,5..]
 
-primeFactors' 0 _ = []
-primeFactors' x i
-  | (current * current > x) = [x]
-  | x `mod` current == 0 = current : primeFactors' (x `div` current) 0
-  | otherwise = primeFactors' x (i + 1)
-    where current = primes !! i
+primeFactors n = factor n primes
+  where
+    factor n (p:ps) 
+        | p*p > n        = [n]
+        | n `mod` p == 0 = p : factor (n `div` p) (p:ps)
+        | otherwise      =     factor n ps
 
-problem3 = maximum (primeFactors' 600851475143 0)
+problem3 = maximum (primeFactors 600851475143)
 -- 6857
 
 --------------------------------------------------------------------------
@@ -97,8 +95,8 @@ problem9 = head [a*b*(1000-(a+b)) | a <- [1..998], b <- [1..(999-a)],
 --------------------------------------------------------------------------
 
 -- 10: Summation of primes
--- UNSOLVED
-problem10 = sum (take 2000000 primes)
+problem10 = sum (takeWhile (< 2000000) primes)
+-- 142913828922
 
 --------------------------------------------------------------------------
 
@@ -364,5 +362,7 @@ problem25 = (unjuster (findIndex (==1000) lens)) + 1
 -- 4782
 
 --------------------------------------------------------------------------
+
+-- 26: Reciprocal cycles
 
 
