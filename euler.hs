@@ -1,6 +1,7 @@
 import Data.Char
 import Data.List
-
+import Data.Matrix
+import Data.Numbers.Primes
 
 -- 1: Multiples of 3 and 5
 problem1 = sum [x | x <- [1..999], (mod x 3) == 0 || (mod x 5) == 0]
@@ -17,15 +18,6 @@ problem2 = sum [x | x <- takeWhile (< 4000000) (fib 0 1)]
 --------------------------------------------------------------------------
 
 -- 3: Largest prime factor
-primes = 2 : filter (null . tail . primeFactors) [3,5..]
-
-primeFactors n = factor n primes
-  where
-    factor n (p:ps) 
-        | p*p > n        = [n]
-        | n `mod` p == 0 = p : factor (n `div` p) (p:ps)
-        | otherwise      =     factor n ps
-
 problem3 = maximum (primeFactors 600851475143)
 -- 6857
 
@@ -135,7 +127,7 @@ setsOf4 [w,x,y,z] = [[w,x,y,z]]
 setsOf4 xs = take 4 xs : setsOf4 ( tail xs )
 
 maxHgrid = concat [ setsOf4 xs | xs <- grid ]
-maxVgrid = concat [ setsOf4 xs | xs <- (transpose grid) ]
+maxVgrid = concat [ setsOf4 xs | xs <- (Data.List.transpose grid) ]
 setsOf4D = concat [setsOf4Dlr,setsOf4Drl]
 
 prod4 [w,x,y,z] = w*x*y*z
@@ -364,5 +356,114 @@ problem25 = (unjuster (findIndex (==1000) lens)) + 1
 --------------------------------------------------------------------------
 
 -- 26: Reciprocal cycles
+-- UNSOLVED
+intToList' n = map ( \x -> read [x] :: Int ) $ drop 2 ( show n )
+-- UNSOLVED
+
+--------------------------------------------------------------------------
+
+-- 27: Quadratic primes
+-- UNSOLVED
+form1 n = (n^2) + n + 41
+form2 n = (n^2) - (79*n) + 1601
+
+formula a b n = (n^2) + (a*n) + b
+
+coeffprod a b = a * b
+
+check = all (==True) $ map isPrime $ map form2 [0..79]
+-- check a b = count (True) $ map isPrime $ map (formula a b) [0..100]
+
+test = [ (a,b,test1 a b) | a <- [-999..999], b <- [-1000..1000], (test1 a b)/=[] ]
+
+test1 a b = [ formula a b n | n <- [0..100], isPrime (formula a b n) ]
+
+form n = (n^2) - 999*n - 1000
+-- UNSOLVED
+
+--------------------------------------------------------------------------
+
+-- 28: Number spiral diagonals
+
+{-
+21 22 23 24 25
+20  7  8  9 10
+19  6  1  2 11
+18  5  4  3 12
+17 16 15 14 13
+-}
+{-
+matrix 4 4 $ \(i,j) -> 2*i - j
+(  1  0 -1 -2 )
+(  3  2  1  0 )
+(  5  4  3  2 )
+(  7  6  5  4 )
+-}
+
+m01 = matrix 5 5 $ \(row,col) -> 0
+m02 = setElem 1  (3,3) m01
+m03 = setElem 2  (3,4) m02
+m04 = setElem 3  (4,4) m03
+m05 = setElem 4  (4,3) m04
+m06 = setElem 5  (4,2) m05
+m07 = setElem 6  (3,2) m06
+m08 = setElem 7  (2,2) m07
+m09 = setElem 8  (2,3) m08
+m10 = setElem 9  (2,4) m09
+m11 = setElem 10 (2,5) m10
+m12 = setElem 11 (3,5) m11
+m13 = setElem 12 (4,5) m12
+m14 = setElem 13 (5,5) m13
+m15 = setElem 14 (5,4) m14
+m16 = setElem 15 (5,3) m15
+m17 = setElem 16 (5,2) m16
+m18 = setElem 17 (5,1) m17
+m19 = setElem 18 (4,1) m18
+m20 = setElem 19 (3,1) m19
+m21 = setElem 20 (2,1) m20
+m22 = setElem 21 (1,1) m21
+m23 = setElem 22 (1,2) m22
+m24 = setElem 23 (1,3) m23
+m25 = setElem 24 (1,4) m24
+m26 = setElem 25 (1,5) m25
 
 
+m5 = zero 5 5
+m1001 = zero 1001 1001
+m00 = matrix 5 5 $ \(row,col) -> (row,col)
+
+-- test m 25 c r = setElem 25 (c,r) m
+-- test m v  c r = test (setElem v (c,r) m) (v+1)
+
+minr = 1
+minc = 1
+maxr = 5
+maxc = 5
+half5 = 3
+half1001 = (1001 `div` 2) + 1
+
+half = half5
+
+goLeft  (r,c) = (r,(c-1))
+goDown  (r,c) = ((r+1),c)
+goRight (r,c) = (r,(c+1))
+goUp    (r,c) = ((r-1),c)
+
+nextMove (r,c)
+  | c > minc && r < c = goLeft (r,c)
+  | r < maxr && r > c = goDown (r,c)
+  | c < maxc && r > c = goRight (r,c)
+  | r > minr && r < c = goUp (r,c)
+  | r == c && r < half = goDown (r,c)
+  | r == c && r > half = goUp (r,c)
+
+test3 (3,3) v m = setElem v (3,3) m
+test3 (r,c) v m = test3 (nextMove (r,c)) (v-1) (setElem v (r,c) m)
+
+
+-- (ROW, COLUMN)
+-- ( (1,1) (1,2) (1,3) (1,4) (1,5) )
+-- ( (2,1) (2,2) (2,3) (2,4) (2,5) )
+-- ( (3,1) (3,2) (3,3) (3,4) (3,5) )
+-- ( (4,1) (4,2) (4,3) (4,4) (4,5) )
+-- ( (5,1) (5,2) (5,3) (5,4) (5,5) )
