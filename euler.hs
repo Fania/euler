@@ -2,6 +2,7 @@ import Data.Char
 import Data.List
 import Data.Tuple
 import Data.Matrix
+import Data.Ratio
 import Data.Numbers.Primes
 
 -- 1: Multiples of 3 and 5
@@ -548,19 +549,15 @@ problem32 = [ (a,b,c) | c <- numsWithPanFacts,
 --------------------------------------------------------------------------
 
 -- 33: Digit cancelling fractions
-
--- frac :: (Int,Int) -> Factional
-frac (n,d) = n `div` d
-
 gen2DFracs = [ (n,d) | n <- [10..99], d <- [10..99], n < d ]
 
-test2 = [ (n,d) | (n,d) <- gen2DFracs, 
+fourFrac = [ (n,d) | (n,d) <- gen2DFracs, 
           (head (intToList n)) `elem` (intToList d) ||
           ((intToList n) !! 1) `elem` (intToList d), 
-          ((intToList n) !! 1) /= 0 && ((intToList d) !! 1) /= 0
-          -- let n1 = fst(rmvNums (n,d))::Fractional, 
-          -- let d1 = snd(rmvNums (n,d))::Fractional,
-          -- (n/d) == (n1/d1)
+          ((intToList n) !! 1) /= 0 && ((intToList d) !! 1) /= 0,
+          let n1 = fst(rmvNums (n,d)), 
+          let d1 = snd(rmvNums (n,d)),
+          (n % d) == (n1 % d1)
            ]
 
 rmvNums (n,d) 
@@ -572,5 +569,10 @@ rmvNums (n,d)
                                   (((intToList n) !! 0),((intToList d) !! 1))
   |((intToList n) !! 1) == ((intToList d) !! 1) = 
                                   (((intToList n) !! 0),((intToList d) !! 0))
+
+problem33 = product [ n % d | (n,d) <- fourFrac ]
+-- 100
+
+--------------------------------------------------------------------------
 
 
