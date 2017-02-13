@@ -1,5 +1,6 @@
 import Data.Char
 import Data.List
+import Data.Tuple
 import Data.Matrix
 import Data.Numbers.Primes
 
@@ -449,16 +450,16 @@ goDown  (r,c) = ((r+1),c)
 goRight (r,c) = (r,(c+1))
 goUp    (r,c) = ((r-1),c)
 
-nextMove (r,c)
-  | c > minc && r < c = goLeft (r,c)
-  | r < maxr && r > c = goDown (r,c)
-  | c < maxc && r > c = goRight (r,c)
-  | r > minr && r < c = goUp (r,c)
+nextMove (r,c) (mnr,mnc) (mxr,mxc)
+  | c > mnc && r < c = goLeft (r,c)
+  | r < mxr && r > c = goDown (r,c)
+  | c < mxc && r > c = goRight (r,c)
+  | r > mnr && r < c = goUp (r,c)
   | r == c && r < half = goDown (r,c)
   | r == c && r > half = goUp (r,c)
 
-test3 (3,3) v m = setElem v (3,3) m
-test3 (r,c) v m = test3 (nextMove (r,c)) (v-1) (setElem v (r,c) m)
+-- test3 (3,3) v m = setElem v (3,3) m
+-- test3 (r,c) v m = test3 (nextMove (r,c)) (v-1) (setElem v (r,c) m)
 
 
 -- (ROW, COLUMN)
@@ -467,3 +468,109 @@ test3 (r,c) v m = test3 (nextMove (r,c)) (v-1) (setElem v (r,c) m)
 -- ( (3,1) (3,2) (3,3) (3,4) (3,5) )
 -- ( (4,1) (4,2) (4,3) (4,4) (4,5) )
 -- ( (5,1) (5,2) (5,3) (5,4) (5,5) )
+
+-- UNSOLVED
+
+--------------------------------------------------------------------------
+
+-- 29: Distinct powers
+problem29 = length $ nub [ a ^ b | a <- [2..100], b <- [2..100] ]
+-- 9183
+
+--------------------------------------------------------------------------
+
+-- 30: Digit fifth powers
+pow5 ns = sum [ n ^ 5 | n <- (intToList ns) ]
+isSumPow ns 
+  | ns == 1 = False
+  | otherwise = ns == (pow5 ns)
+
+problem30 = sum [ x | x <- [1..355000], isSumPow x ]
+-- 443839
+
+--------------------------------------------------------------------------
+
+-- 31: Coin sums
+-- coins = [1,2,5,10,20,50,100,200]
+--          a,b,c,d, e, f, g,  h
+
+problem31 = length [ (a,b,c,d,e,f,g,h) | 
+              h <- [0..1], 
+              g <- [0..(2-h)], 
+              f <- [0..(4-h-g)], 
+              e <- [0..(10-h-g-f)],
+              d <- [0..(20-h-g-f-e)], 
+              c <- [0..(40-h-g-f-e-d)], 
+              b <- [0..(100-h-g-f-e-d-c)], 
+              a <- [0..(200-h-g-f-e-d-c-b)], 
+              (a*1 + b*2 + c*5 + d*10 + e*20 + f*50 + g*100 + h*200) == 200 ] 
+-- 73682
+
+--------------------------------------------------------------------------
+
+-- 32: Pandigital products
+
+isPandigital n = all (==True) $ ((map (`elem` [1..l]) xs) ++ [unique xs])
+  where l = length $ intToList n
+        xs = intToList n
+
+unique [n] = True
+unique (n:ns) 
+  | n `notElem` ns = unique ns
+  | otherwise = False
+
+uniqDigits ns = unique $ intToList ns
+
+panDfactors x = [ (a,b) | a <- (filter (uniqDigits) (factors x)), 
+                          b <- (filter (uniqDigits) (factors x)), 
+                          a*b == x, 
+                          not (contains0 a), not (contains0 b),
+                          unique (eqToList a b x) ]
+
+panDfacts x = take n (panDfactors x)
+  where n = length (panDfactors x) `div` 2
+
+contains0 n = 0 `elem` (intToList n)
+
+eqToList a b c = concat $ map intToList [a,b,c]
+
+check2 a b c = isPandigital $ listInt $ listNum $ eqToList a b c
+
+numsWithout0 = takeWhile (<9999) [ x | x <- [1..], 0 `notElem` (intToList x) ]
+numsWithPanFacts = nub [ c | c <- numsWithout0, (a,b) <- panDfacts c ]
+
+problem32 = [ (a,b,c) | c <- numsWithPanFacts, 
+                         (a,b) <- (panDfacts c), 
+                         (length (eqToList a b c)) == 9]
+
+-- 45228
+
+--------------------------------------------------------------------------
+
+-- 33: Digit cancelling fractions
+
+-- frac :: (Int,Int) -> Factional
+frac (n,d) = n `div` d
+
+gen2DFracs = [ (n,d) | n <- [10..99], d <- [10..99], n < d ]
+
+test2 = [ (n,d) | (n,d) <- gen2DFracs, 
+          (head (intToList n)) `elem` (intToList d) ||
+          ((intToList n) !! 1) `elem` (intToList d), 
+          ((intToList n) !! 1) /= 0 && ((intToList d) !! 1) /= 0
+          -- let n1 = fst(rmvNums (n,d))::Fractional, 
+          -- let d1 = snd(rmvNums (n,d))::Fractional,
+          -- (n/d) == (n1/d1)
+           ]
+
+rmvNums (n,d) 
+  |((intToList n) !! 0) == ((intToList d) !! 0) = 
+                                  (((intToList n) !! 1),((intToList d) !! 1))
+  |((intToList n) !! 0) == ((intToList d) !! 1) = 
+                                  (((intToList n) !! 1),((intToList d) !! 0))
+  |((intToList n) !! 1) == ((intToList d) !! 0) = 
+                                  (((intToList n) !! 0),((intToList d) !! 1))
+  |((intToList n) !! 1) == ((intToList d) !! 1) = 
+                                  (((intToList n) !! 0),((intToList d) !! 0))
+
+
