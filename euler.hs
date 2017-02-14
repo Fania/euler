@@ -496,7 +496,6 @@ problem30 = sum [ x | x <- [1..355000], isSumPow x ]
 -- 31: Coin sums
 -- coins = [1,2,5,10,20,50,100,200]
 --          a,b,c,d, e, f, g,  h
-
 problem31 = length [ (a,b,c,d,e,f,g,h) | 
               h <- [0..1], 
               g <- [0..(2-h)], 
@@ -512,7 +511,6 @@ problem31 = length [ (a,b,c,d,e,f,g,h) |
 --------------------------------------------------------------------------
 
 -- 32: Pandigital products
-
 isPandigital n = all (==True) $ ((map (`elem` [1..l]) xs) ++ [unique xs])
   where l = length $ intToList n
         xs = intToList n
@@ -545,7 +543,6 @@ numsWithPanFacts = nub [ c | c <- numsWithout0, (a,b) <- panDfacts c ]
 problem32 = [ (a,b,c) | c <- numsWithPanFacts, 
                          (a,b) <- (panDfacts c), 
                          (length (eqToList a b c)) == 9]
-
 -- 45228
 
 --------------------------------------------------------------------------
@@ -602,3 +599,27 @@ problem36 = sum [ x | x <- [1..1000000], check36 x ]
 
 --------------------------------------------------------------------------
 
+-- 37: Truncatable primes
+truncLists n = tail $ filter (/=[]) ((tails $ intToList n) ++ (inits $ intToList n))
+truncates n = map list2Int (truncLists n)
+allPrime n = all (==True) $ map isPrime (truncates n)
+problem37 = sum [ x | x <- (takeWhile (<750000) primes), allPrime x ]
+-- 748334
+
+--------------------------------------------------------------------------
+
+-- 38: Pandigital multiples
+
+concatProd x 1 = [x]
+concatProd x n = concatProd x (n-1) ++ [(x*n)]
+
+conpro x n = list2Int (concatProd x n)
+-- is9Pan (read (concatProd 192) :: Int)
+
+is9pan n = (all (==True) zs) && (length (intToList n) == 9)
+  where xs = intToList n
+        zs = (map (`elem` [1..9]) xs) ++ [unique xs]
+
+-- problem38 = [ x | x <- [2..], is9pan (read (concatProd x) :: Int) ]
+problem38 = [ x | x <- [1..10], n <- [2..10], is9pan (conpro x n) ]
+test38 x n = is9pan (conpro x n)
