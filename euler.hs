@@ -1,3 +1,4 @@
+import Numeric
 import Data.Char
 import Data.List
 import Data.Tuple
@@ -26,8 +27,9 @@ problem3 = maximum (primeFactors 600851475143)
 --------------------------------------------------------------------------
 
 -- 4: Largest palindrome product
+isPal x = show x == reverse(show x)
 problem4 = maximum [x * y | x <- [100..999], y <- [100..999], isPal (x * y)]
-  where isPal x = show x == reverse(show x)
+  -- where isPal x = show x == reverse(show x)
 -- 906609
 
 --------------------------------------------------------------------------
@@ -575,4 +577,28 @@ problem33 = product [ n % d | (n,d) <- fourFrac ]
 
 --------------------------------------------------------------------------
 
+-- 34: Digit factorials
+fac n = product [1..n]
+facSum n = sum $ map fac (intToList n)
+problem34 = [ x | x <- [3..100000], (facSum x) == x ]
+-- 40730
+
+--------------------------------------------------------------------------
+
+-- 35: Circular primes
+rotations xs = init (zipWith (++) (tails xs) (inits xs))
+list2Int ns = listInt $ listNum ns
+check35 n = all (isPrime) (map list2Int (rotations (intToList n)))
+problem35 = length [ x | x <- (takeWhile (<1000000) primes), check35 x ]
+-- 55
+
+--------------------------------------------------------------------------
+
+-- 36: Double-base palindromes
+check36 n = isPal n && (isPal $ dec2bin n)
+dec2bin x = read (showIntAtBase 2 intToDigit x "") :: Integer
+problem36 = sum [ x | x <- [1..1000000], check36 x ] 
+-- 872187
+
+--------------------------------------------------------------------------
 
