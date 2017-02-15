@@ -83,9 +83,10 @@ problem8 = maximum (map prod13 (seq13wo0 (seq13 num)))
 --------------------------------------------------------------------------
 
 -- 9: Special Pythagorean triplet
+isPyth x y z = x^2 + y^2 == z^2
 problem9 = head [a*b*(1000-(a+b)) | a <- [1..998], b <- [1..(999-a)], 
                  isPyth a b (1000-(a+b)), (a+b+(1000-(a+b)))==1000]
-  where isPyth x y z = x^2 + y^2 == z^2
+  -- where isPyth x y z = x^2 + y^2 == z^2
 -- 31875000
 
 --------------------------------------------------------------------------
@@ -609,17 +610,51 @@ problem37 = sum [ x | x <- (takeWhile (<750000) primes), allPrime x ]
 --------------------------------------------------------------------------
 
 -- 38: Pandigital multiples
-
+concatProd :: Integer -> Integer -> [Integer]
 concatProd x 1 = [x]
 concatProd x n = concatProd x (n-1) ++ [(x*n)]
 
-conpro x n = list2Int (concatProd x n)
--- is9Pan (read (concatProd 192) :: Int)
+conpro :: Integer -> Integer -> Integer
+conpro x n = (list2Int38 (concatProd x n))
 
+listInteger s = read s :: Integer
+list2Int38 :: [Integer] -> Integer
+list2Int38 ns = listInteger $ listNum ns
+
+is9pan :: Integer -> Bool
 is9pan n = (all (==True) zs) && (length (intToList n) == 9)
   where xs = intToList n
         zs = (map (`elem` [1..9]) xs) ++ [unique xs]
 
--- problem38 = [ x | x <- [2..], is9pan (read (concatProd x) :: Int) ]
-problem38 = [ x | x <- [1..10], n <- [2..10], is9pan (conpro x n) ]
-test38 x n = is9pan (conpro x n)
+problem38 = maximum [ conpro x n | x <- [1..10000], n <- [2..9], is9pan (conpro x n) ]
+-- 932718654
+
+--------------------------------------------------------------------------
+
+-- 39: Integer right triangles
+
+-- isPyth x y z = x^2 + y^2 == z^2
+
+test39 p = [ (x,y,z) | x <- [1..118], y <- [1..(120-x)], z <- [1..(120-x-y)], 
+                  (isPyth x y z) && (x+y+z == p),
+                  x < y && y < z ]
+
+test39x p = [ (x,y,z) | x <- [1..998], y <- [1..(1000-x)], z <- [1..(1000-x-y)], 
+                  (isPyth x y z) && (x+y+z == p),
+                  x < y && y < z ]
+
+problem39 = [ (p,[x,y,z]) | p <- [3..1000], 
+                  x <- [1..995], y <- [1..(1000-x)], z <- [1..(1000-x-y)], 
+                  (isPyth x y z) && (x+y+z == p) ]
+-- UNSOLVED
+
+--------------------------------------------------------------------------
+
+-- 40: Champernowne's constant
+champdenom = take 1000000 $ concat $ map show [1..]
+takenth n = digitToInt (champdenom !! n)
+problem40 = product $ map takenth [0,9,99,999,9999,99999,999999]
+-- 210
+
+--------------------------------------------------------------------------
+
