@@ -4,6 +4,7 @@ import Data.List
 import Data.Tuple
 import Data.Matrix
 import Data.Ratio
+import Text.Printf
 import Data.Numbers.Primes
 
 -- 1: Multiples of 3 and 5
@@ -512,7 +513,7 @@ problem31 = length [ (a,b,c,d,e,f,g,h) |
 --------------------------------------------------------------------------
 
 -- 32: Pandigital products
-isPandigital n = all (==True) $ ((map (`elem` [1..l]) xs) ++ [unique xs])
+isPandigital' n = all (==True) $ ((map (`elem` [1..l]) xs) ++ [unique xs])
   where l = length $ intToList n
         xs = intToList n
 
@@ -536,7 +537,7 @@ contains0 n = 0 `elem` (intToList n)
 
 eqToList a b c = concat $ map intToList [a,b,c]
 
-check2 a b c = isPandigital $ listInt $ listNum $ eqToList a b c
+check2 a b c = isPandigital' $ listInt $ listNum $ eqToList a b c
 
 numsWithout0 = takeWhile (<9999) [ x | x <- [1..], 0 `notElem` (intToList x) ]
 numsWithPanFacts = nub [ c | c <- numsWithout0, (a,b) <- panDfacts c ]
@@ -674,5 +675,110 @@ problem41 = maximum [ maximum ns | x <- [2..9], let ns = nDigitPrimes x, ns /= [
 
 --------------------------------------------------------------------------
 
+-- 43: Sub-string divisibility
 
+isPandigital n = all (==True) $ ((map (`elem` [1..l]) xs) ++ [unique xs])
+  where l = length $ intToList n
+        xs = intToList n
 
+is09pan :: Integer -> Bool
+is09pan n = (all (==True) zs) && (length (intToList n) == 10)
+  where xs = intToList n
+        zs = (map (`elem` [0..9]) xs) ++ [unique xs]
+
+intToList43 n
+  | head (printf "%09" n) == '0' = map ( \x -> read [x] :: Int ) ( '0' : show n )
+  | otherwise = map ( \x -> read [x] :: Int ) ( show n )
+
+-- printf "%02d\n" 01
+
+-- need to check if an int 0123 starts with a leading 0 somehow
+-- UNSOLVED
+
+--------------------------------------------------------------------------
+
+-- 44: Pentagon numbers
+
+pentagons = takeWhile (<6000000) [ x * (3 * x - 1) `div` 2 | x <- [1..] ]
+
+isPentagonal n = n `elem` (takeWhile (<=n) pentagons)
+
+problem44a = [ (abs(k-j),j,k) | j <- pentagons, k <- [(j-100)..(j+100)],
+                                isPentagonal k, k > 0, k /= j ]
+
+problem44b = [ (abs(k-j),j,k) | j <- pentagons, k <- [(j-300)..(j+300)],
+                      isPentagonal k, k > 0, k /= j,
+                      isPentagonal (j+k) && isPentagonal (abs (k-j)) ]
+
+problem44 = [ (abs(k-j),j,k) | j <- pentagons, k <- pentagons,
+                      isPentagonal (j+k) && isPentagonal (abs (k-j)) ]
+-- UNSOLVED
+
+--------------------------------------------------------------------------
+
+-- 45: 
+-- UNSOLVED
+
+--------------------------------------------------------------------------
+
+-- 46: Goldbach's other conjecture
+isGoldbach n p s = n == (p + (2 * (s ^ 2)))
+
+oddcomps = [ n | n <- [9..], odd n, not (isPrime n) ]
+
+check46 n = [ ((n,p,s),x) | p <- (takeWhile (<n) primes), 
+                               s <- [1..(n-p)],
+                               let x = isGoldbach n p s ]
+
+problem46 = head [ o | o <- oddcomps, 
+                 all (\((n,p,s),x) -> x==False) (check46 o) ]
+
+-- SLOW
+-- 5777
+
+--------------------------------------------------------------------------
+
+-- 47: Distinct primes factors
+distinctFacts n = [ p | p <- [1..], (length $ nub $ primeFactors p) == n ]
+
+isSuccSeq xs = and $ zipWith ((==) . succ) xs (tail xs)
+
+sub4seq xs = [ ys | ys <- setsOf4 xs, isSuccSeq ys]
+
+problem47 = head $ head $ sub4seq $ distinctFacts 4
+-- 134043
+
+--------------------------------------------------------------------------
+
+-- 48: Self powers
+selfPow 1 = 1^1
+selfPow n = n^n + (selfPow (n-1))
+
+integerToList n = map ( \x -> read [x] :: Integer ) ( show n )
+
+pow1000 = selfPow 1000
+lenPow1000 = length (integerToList pow1000)
+dropLenPow1000 = drop (lenPow1000 - 10) (integerToList pow1000)
+
+problem48 = list2Int38 dropLenPow1000
+-- 9110846700
+
+--------------------------------------------------------------------------
+
+-- 49: Prime permutations
+isPermutation n m = xs `elem` (permutations ys)
+  where xs = intToList n
+        ys = intToList m
+    
+arePermutations ns = and $ zipWith isPermutation ns (tail ns)
+
+seq49 x y z = isPrime x && isPrime y && isPrime z && arePermutations [x,y,z]
+
+fourDigitPrimes = takeWhile (<= 9999) primes
+
+problem49 = [ list2Int [x,y,z] | x <- fourDigitPrimes, 
+                        let y = (x+3330), let z = (y+3330), 
+                        seq49 x y z ] !! 1
+-- 296962999629
+
+--------------------------------------------------------------------------
